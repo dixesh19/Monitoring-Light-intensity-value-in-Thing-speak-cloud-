@@ -1,3 +1,7 @@
+### NAME: DINESH R
+
+### REG NO: 24900440
+
 # Monitoring-Light-intensity-value-in-Thing-speak-cloud
 # Uploading LDR sensor data in Thing Speak cloud
 
@@ -38,7 +42,7 @@ An electronic component like LDR or light-dependent resistor is responsive to li
 The resistance values of LDR in darkness are several megaohms whereas in bright light it will be dropped to hundred ohms. So due to this change in resistance, these resistors are extremely used in different applications. The LDR sensitivity also changes through the incident light’s wavelength.
 The designing of LDRs can be done by using semiconductor materials to allow their light-sensitive properties. The famous material used in this resistor is CdS (cadmium sulfide), even though the utilization of this material is currently restricted in European countries due to some environmental issues while using this material. Likewise, CdSe (cadmium selenide) is also restricted and additional materials that can be employed mainly include PbS (lead sulfide), InS ( indium antimonide).
 Even though for these resistors, a semiconductor material is used, because they are simply passive devices and they do not have a PN-junction. This detaches them from other LDRs such as phototransistors & photodiodes.
-![image](https://github.com/user-attachments/assets/40d9f50a-c34a-4b6f-bbd0-d80be0cd418e)
+<img src="https://github.com/user-attachments/assets/40d9f50a-c34a-4b6f-bbd0-d80be0cd418e" width="300" height="250">
 ## LDR Symbol
 In electronic circuits, the LDR symbol is used that mainly depends on the resistor symbol; however, it illustrates the light rays in the arrows form. In this way, it follows the same principle which is used for phototransistor & photodiode circuit symbols wherever arrows are utilized to demonstrate the light dropping on these types of components. The LDR circuit symbols are shown below.
 ![image](https://github.com/user-attachments/assets/b7cf98ab-1f73-4c68-94b2-02d6209eb5f0)
@@ -90,8 +94,73 @@ Prototype and build IoT systems without setting up servers or developing web sof
 
  
 # PROGRAM:
+```
+#include <WiFi.h>
+#include "ThingSpeak.h"
+#define ldr_pin 34
+
+char ssid[] = "Dinsh"; 
+char pass[] = "monkeyDluffy";
+int keyIndex = 0;
+WiFiClient  client;
+
+unsigned long myChannelNumber =  2788340;
+const int ChannelField = 1;
+const char * myWriteAPIKey = "Y2YROF4BS19UCV3I";
+
+int ldrValue = 0;
+int lightPercentage = 0;
+
+const int darkValue = 4095;
+const int brightValue = 0;  
+
+
+void setup() 
+{
+  Serial.begin(115200);
+  pinMode(ldr_pin, INPUT);
+  WiFi.mode(WIFI_STA);   
+  ThingSpeak.begin(client);
+}
+
+void loop() 
+{
+  if(WiFi.status() != WL_CONNECTED)
+{
+    Serial.print("Attempting to connect to SSID: ");
+    
+    while(WiFi.status() != WL_CONNECTED)
+    {
+      WiFi.begin(ssid, pass); 
+      Serial.print(".");
+      delay(5000);     
+    } 
+    Serial.println("\nConnected.");
+  }
+
+  int ldrValue= analogRead(ldr_pin);  
+  
+  lightPercentage = map(ldrValue, darkValue, brightValue, 0, 100);
+
+  lightPercentage = constrain(lightPercentage, 0, 100);
+  Serial.println("Intensity=");
+  Serial.println(lightPercentage);    
+  Serial.println("%");
+  
+  ThingSpeak.writeField(myChannelNumber, ChannelField, lightPercentage, myWriteAPIKey);
+  delay(5000); 
+}
+```
 # CIRCUIT DIAGRAM:
+
+<img src="https://github.com/user-attachments/assets/1b47c13f-6ee4-4f51-95cb-770f78b21104" width="600">
+
 # OUTPUT:
+
+<img src="https://github.com/user-attachments/assets/57961e34-637e-40ab-af76-4d01f391893a" width="800">
+
+<img src="https://github.com/user-attachments/assets/986e2a53-cb09-435f-bd49-965668560500" width="600">
+
 # RESULT:
 
 Thus the light intensity values are updated in the Thing speak cloud using ESP32 controller.
